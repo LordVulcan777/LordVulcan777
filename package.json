@@ -4,6 +4,7 @@
   "description": "Node.js simulation of LCNC + RPA + selective blockchain trust architecture",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dashboard": "node index.js && open dashboard.html"
   }
 }
