@@ -3,168 +3,159 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PO Demo - Hyperautomation Dashboard</title>
+  <title>Hyperautomation Thesis Dashboard</title>
   <style>
-    :root{--bg:#070c18;--panel:#101a31;--card:#172544;--text:#ebf1ff;--muted:#9fb2db;--act:#39c0ed;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--a:#ff5d8f;--b:#2dd4bf;--c:#84cc16;--d:#a78bfa;--t:#fb923c}
+    :root{--bg:#0b1020;--panel:#141b2d;--card:#1b2540;--text:#eaf0ff;--muted:#9fb0d3;--active:#2dd4bf;--warn:#f59e0b;--bad:#ef4444;--ok:#22c55e;--loop:#8b5cf6}
     *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial,sans-serif}
-    body{margin:0;background:radial-gradient(circle at 10% 10%,#12244f 0,#070c18 60%);color:var(--text)}
-    .app{display:grid;grid-template-columns:1fr 350px;gap:12px;max-width:1500px;margin:auto;padding:14px}
-    .left,.right{background:rgba(16,26,49,.95);border:1px solid #2b4274;border-radius:12px}
-    .left{padding:12px}.right{padding:12px;position:sticky;top:10px;height:fit-content}
-    h1{margin:0 0 4px;font-size:22px}.sub{margin:0 0 10px;color:var(--muted);font-size:13px}
-    .layers{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-    .layer{background:linear-gradient(180deg,#1a2b4f,#132241);border:1px solid #334f86;border-radius:10px;padding:10px;min-height:90px;position:relative;transition:.25s}
-    .layer h3{margin:0;font-size:14px}.layer p{margin:6px 0 0;color:var(--muted);font-size:12px}
-    .layer.active{outline:2px solid var(--act);transform:translateY(-2px)}
-    .layer .tag{position:absolute;top:8px;right:8px;font-size:10px;color:#d4e2ff;background:#243c6c;padding:3px 6px;border-radius:999px}
-    .loop{border-left:5px solid transparent}
-    .loopA{border-left-color:var(--a)} .loopB{border-left-color:var(--b)} .loopC{border-left-color:var(--c)} .loopD{border-left-color:var(--d)} .loopT{border-left-color:var(--t)}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-    .panel{background:#0c1530;border:1px solid #2d467a;border-radius:10px;padding:10px}
-    .log,.trace{height:220px;overflow:auto;white-space:pre-wrap;font:12px ui-monospace,Consolas,monospace;background:#091126;border:1px solid #2e497d;border-radius:8px;padding:8px}
-    .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .k{background:#0a1329;border:1px solid #2c4476;border-radius:8px;padding:8px}.k .v{font-size:18px;font-weight:700}
-    select,button,input[type=range]{width:100%;margin-bottom:8px;background:#0e1730;color:var(--text);border:1px solid #385892;border-radius:8px;padding:9px}
-    button{cursor:pointer}.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .preview{background:#0b1430;border:1px solid #2f497c;border-radius:10px;padding:10px;font-size:12px}
-    .legend{display:flex;flex-wrap:wrap;gap:6px}.pill{font-size:11px;padding:3px 7px;border-radius:999px;border:1px solid #4966a1}
-    .A{background:#311322;border-color:var(--a)}.B{background:#12312e;border-color:var(--b)}.C{background:#1f3011;border-color:var(--c)}.D{background:#23193b;border-color:var(--d)}.T{background:#3a2414;border-color:var(--t)}
+    body{margin:0;background:linear-gradient(180deg,#0a0f1f,#0f172a);color:var(--text)}
+    .wrap{max-width:1320px;margin:0 auto;padding:20px}
+    h1{font-size:24px;margin:0 0 8px}
+    .sub{color:var(--muted);margin-bottom:14px}
+    .top{display:flex;gap:12px;flex-wrap:wrap;align-items:center;background:var(--panel);padding:12px;border-radius:12px;border:1px solid #223056}
+    select,button{background:#111a30;color:var(--text);border:1px solid #304575;border-radius:8px;padding:10px}
+    button{cursor:pointer}
+    .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}
+    .card{background:var(--card);border:1px solid #2b3b66;border-radius:10px;padding:12px;min-height:78px;position:relative;transition:.2s}
+    .card h3{margin:0;font-size:13px;color:#d3defa}
+    .card p{margin:6px 0 0;color:var(--muted);font-size:12px}
+    .active{outline:2px solid var(--active);box-shadow:0 0 0 2px rgba(45,212,191,.2) inset;transform:translateY(-2px)}
+    .loopA,.loopB,.loopC,.loopD,.loopT{border-color:var(--loop)}
+    .panes{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-top:14px}
+    .panel{background:var(--panel);border:1px solid #223056;border-radius:12px;padding:12px}
+    .log{height:320px;overflow:auto;background:#0f162b;border:1px solid #2b3b66;border-radius:8px;padding:8px;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+    .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+    .k{background:#0f162b;border:1px solid #2b3b66;border-radius:8px;padding:10px}
+    .k .v{font-size:18px;font-weight:700}
+    .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .pill{padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid #334b80;background:#101b36;color:#c5d4fb}
   </style>
 </head>
 <body>
-  <div class="app">
-    <section class="left">
-      <h1>PO Demo: Hyperautomation Flow</h1>
-      <p class="sub">Animated architecture layers with visible loop paths (A/B/C/D/T), execution telemetry, and thesis KPI view.</p>
-      <div class="layers" id="layers"></div>
+  <div class="wrap">
+    <h1>Hyperautomation Architecture Simulation Dashboard</h1>
+    <div class="sub">Interactive thesis-demo view using the same scenario semantics as <code>index.js</code>.</div>
 
-      <div class="row">
-        <div class="panel"><h3>Execution Log</h3><div class="log" id="log"></div></div>
-        <div class="panel"><h3>Loop Trace</h3><div class="trace" id="trace"></div></div>
+    <div class="top">
+      <select id="scenarioSelect"></select>
+      <button id="runBtn">Run Scenario</button>
+      <button id="runAllBtn">Run All Scenarios</button>
+      <span class="pill">Loop A = Exception Handling</span>
+      <span class="pill">Loop B = Blockchain Bypass</span>
+      <span class="pill">Loop C = Downstream Re-entry</span>
+      <span class="pill">Loop D = Monitoring Feedback</span>
+      <span class="pill">Loop T = Smart-Contract Timeout</span>
+    </div>
+
+    <div class="grid" id="cards"></div>
+
+    <div class="panes">
+      <div class="panel">
+        <h3>Execution Log</h3>
+        <div class="log" id="log"></div>
       </div>
-
-      <div class="panel" style="margin-top:10px">
-        <h3>KPI Cards</h3>
+      <div class="panel">
+        <h3>Scenario KPIs</h3>
         <div class="kpis">
           <div class="k"><div>Cycle Count</div><div class="v" id="kCycle">0</div></div>
-          <div class="k"><div>Final Status</div><div class="v" id="kStatus">READY</div></div>
+          <div class="k"><div>Final Status</div><div class="v" id="kStatus">-</div></div>
           <div class="k"><div>Loops Triggered</div><div class="v" id="kLoops">-</div></div>
           <div class="k"><div>Blockchain Proof</div><div class="v" id="kProof">No</div></div>
           <div class="k"><div>Human Intervention</div><div class="v" id="kHuman">No</div></div>
-          <div class="k"><div>Current PO</div><div class="v" id="kPO">-</div></div>
         </div>
       </div>
-    </section>
-
-    <aside class="right">
-      <h3>Scenario Control Panel</h3>
-      <select id="scenario"></select>
-      <div class="btns">
-        <button id="run">Run</button>
-        <button id="runAll">Run All</button>
-        <button id="pause">Pause</button>
-        <button id="resume">Resume</button>
-        <button id="step">Step +1</button>
-        <button id="reset">Reset</button>
-      </div>
-      <label>Animation speed <span id="speedLabel">850ms</span></label>
-      <input type="range" id="speed" min="250" max="2200" step="50" value="850" />
-
-      <h4>PO / Scenario Preview</h4>
-      <div class="preview" id="preview"></div>
-
-      <h4>Loop Legend</h4>
-      <div class="legend">
-        <span class="pill A">A Exception</span><span class="pill B">B Bypass</span><span class="pill C">C Re-entry</span><span class="pill D">D Feedback</span><span class="pill T">T Timeout</span>
-      </div>
-    </aside>
+    </div>
   </div>
 
 <script>
-const LAYERS=[
-['entry','Event Entry Gate','Authenticate actors · normalize events'],
-['lcnc','LCNC Workflow Engine','Routing + case management'],
-['rpaExec','RPA Execution','Extraction + cross-system handling'],
-['val','Validation','3-way match + rule checks'],
-['ex','Exception Handling','Escalation + human approval + retry'],
-['bDecision','Blockchain Decision','Proof required?'],
-['ledger','Blockchain Ledger / Smart Contract','Hash + smart contract'],
-['off','Off-chain Traceability Store','Operation records + hash link'],
-['down','Downstream Actions','Payment + SLA + compliance'],
-['mon','Monitoring / KPI Feedback','KPIs + Loop D feedback']
+const steps = [
+  ['entry','Event Entry Gate','Auth + normalization + integrity checks'],
+  ['lcnc','LCNC Workflow Engine','Routing + case state tracking'],
+  ['rpaExec','RPA Execution','Extraction + cross-system handling'],
+  ['validation','Validation','3-way match + rule checks'],
+  ['exception','Exception Handling','Escalation + human review + retry'],
+  ['bDecision','Blockchain Decision','Selective proof required?'],
+  ['ledger','Blockchain Ledger / Smart Contract','Hash + smart contract verification'],
+  ['offchain','Off-chain Traceability Store','EPCIS/CBV record + hash linkage'],
+  ['downstream','Downstream Actions','Payment + SLA + compliance logs'],
+  ['monitor','Monitoring / KPI Feedback','KPI + feedback Loop D'],
 ];
 
-const scenarios=[
-  { name:'Happy path: clean PO, no exceptions', poId:'PO-1001', actor:'supplier-alpha', amountEUR:12000, poQty:100, grQty:100, invoiceAmount:12000, currency:'EUR' },
-  { name:'Quantity mismatch: GR differs from PO, human resolves', poId:'PO-1002', actor:'supplier-alpha', amountEUR:15000, poQty:100, grQty:95, invoiceAmount:15000, currency:'EUR' },
-  { name:'Invoice amount mismatch', poId:'PO-1003', actor:'manufacturer-1', amountEUR:18000, poQty:50, grQty:50, invoiceAmount:17900, currency:'EUR' },
-  { name:'High-value PO: mandatory blockchain proof > €50k', poId:'PO-1004', actor:'supplier-alpha', amountEUR:70000, poQty:10, grQty:10, invoiceAmount:70000, currency:'EUR' },
-  { name:'Duplicate PO rejected', poId:'PO-1001', actor:'supplier-alpha', amountEUR:12000, poQty:100, grQty:100, invoiceAmount:12000, currency:'EUR' },
-  { name:'Corrupt data rejected', poId:'PO-1005', actor:'supplier-alpha', amountEUR:5000, poQty:10, grQty:10, currency:'EUR' },
-  { name:'Unauthorized actor rejected', poId:'PO-1006', actor:'unknown-supplier', amountEUR:6000, poQty:20, grQty:20, invoiceAmount:6000, currency:'EUR' },
-  { name:'Smart contract timeout Loop T', poId:'PO-1007', actor:'manufacturer-1', amountEUR:90000, poQty:4, grQty:4, invoiceAmount:90000, currency:'EUR', smartContractTimeout:true },
-  { name:'Retry limit exceeded terminal', poId:'PO-1008', actor:'supplier-alpha', amountEUR:20000, poQty:30, grQty:20, invoiceAmount:20000, currency:'EUR', unresolvable:true },
-  { name:'Partial delivery split payment', poId:'PO-1009', actor:'logistics-7', amountEUR:24000, poQty:100, grQty:60, invoiceAmount:24000, currency:'EUR', partialDelivery:true },
-  { name:'Compliance audit mandatory on-chain proof', poId:'PO-1010', actor:'retailer-9', amountEUR:8000, poQty:12, grQty:12, invoiceAmount:8000, currency:'EUR', complianceAuditFlag:true },
-  { name:'Direct reroute Loop C', poId:'PO-1011', actor:'supplier-alpha', amountEUR:3000, poQty:5, grQty:5, invoiceAmount:3000, currency:'EUR', directFromEntry:true },
-  { name:'Manual-only workflow route', poId:'PO-1012', actor:'manufacturer-1', amountEUR:11000, poQty:40, grQty:40, invoiceAmount:11000, currency:'EUR', manualOnly:true },
+const scenarios = [
+  { name: 'Happy path: clean PO, no exceptions', poId: 'PO-1001', actor: 'supplier-alpha', amountEUR: 12000, poQty: 100, grQty: 100, invoiceAmount: 12000, currency: 'EUR' },
+  { name: 'Quantity mismatch: GR differs from PO, human resolves', poId: 'PO-1002', actor: 'supplier-alpha', amountEUR: 15000, poQty: 100, grQty: 95, invoiceAmount: 15000, currency: 'EUR' },
+  { name: 'Invoice amount mismatch', poId: 'PO-1003', actor: 'manufacturer-1', amountEUR: 18000, poQty: 50, grQty: 50, invoiceAmount: 17900, currency: 'EUR' },
+  { name: 'High-value PO: mandatory blockchain proof > €50k', poId: 'PO-1004', actor: 'supplier-alpha', amountEUR: 70000, poQty: 10, grQty: 10, invoiceAmount: 70000, currency: 'EUR' },
+  { name: 'Duplicate PO: same PO submitted twice, rejected at entry', poId: 'PO-1001', actor: 'supplier-alpha', amountEUR: 12000, poQty: 100, grQty: 100, invoiceAmount: 12000, currency: 'EUR' },
+  { name: 'Corrupt data: missing required fields', poId: 'PO-1005', actor: 'supplier-alpha', amountEUR: 5000, poQty: 10, grQty: 10, currency: 'EUR' },
+  { name: 'Unauthorized actor', poId: 'PO-1006', actor: 'unknown-supplier', amountEUR: 6000, poQty: 20, grQty: 20, invoiceAmount: 6000, currency: 'EUR' },
+  { name: 'Smart contract timeout: Loop T fires', poId: 'PO-1007', actor: 'manufacturer-1', amountEUR: 90000, poQty: 4, grQty: 4, invoiceAmount: 90000, currency: 'EUR', smartContractTimeout: true },
+  { name: 'Retry limit exceeded: terminal status', poId: 'PO-1008', actor: 'supplier-alpha', amountEUR: 20000, poQty: 30, grQty: 20, invoiceAmount: 20000, currency: 'EUR', unresolvable: true },
+  { name: 'Partial delivery: split payment', poId: 'PO-1009', actor: 'logistics-7', amountEUR: 24000, poQty: 100, grQty: 60, invoiceAmount: 24000, currency: 'EUR', partialDelivery: true },
+  { name: 'Compliance audit flag: mandatory on-chain proof', poId: 'PO-1010', actor: 'retailer-9', amountEUR: 8000, poQty: 12, grQty: 12, invoiceAmount: 8000, currency: 'EUR', complianceAuditFlag: true },
+  { name: 'Edge case: direct rerouting path (Loop C)', poId: 'PO-1011', actor: 'supplier-alpha', amountEUR: 3000, poQty: 5, grQty: 5, invoiceAmount: 3000, currency: 'EUR', directFromEntry: true },
+  { name: 'Edge case: manual-only workflow route', poId: 'PO-1012', actor: 'manufacturer-1', amountEUR: 11000, poQty: 40, grQty: 40, invoiceAmount: 11000, currency: 'EUR', manualOnly: true },
 ];
 
-const trusted=new Set(['supplier-alpha','manufacturer-1','logistics-7','retailer-9']);
-const seen=new Set();
-let paused=false,grant=0,running=false;
-const $=id=>document.getElementById(id);
+const state = {seenPOs:new Set(), trusted:new Set(['supplier-alpha','manufacturer-1','logistics-7','retailer-9'])};
+const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+const cards = document.getElementById('cards');
+const logEl = document.getElementById('log');
 
-function initLayers(){ $('layers').innerHTML=''; LAYERS.forEach(([id,t,d])=>{const el=document.createElement('div');el.className='layer';el.id=id;el.innerHTML=`<span class='tag'>Layer</span><h3>${t}</h3><p>${d}</p>`;$('layers').appendChild(el);}); }
-function act(id){document.querySelectorAll('.layer').forEach(e=>e.classList.remove('active'));$(id)?.classList.add('active');}
-function log(m){$('log').textContent+=m+'\n';$('log').scrollTop=$('log').scrollHeight;}
-function loopTag(loop,msg){const line=document.createElement('div');line.className='layer loop loop'+loop;line.style.minHeight='unset';line.style.padding='6px 8px';line.innerHTML=`<b>Loop ${loop}</b> → ${msg}`;$('trace').appendChild(line);$('trace').scrollTop=$('trace').scrollHeight;}
-async function delay(){while(paused&&grant===0)await new Promise(r=>setTimeout(r,80));if(grant>0)grant--;await new Promise(r=>setTimeout(r,+$('speed').value));}
-function setPreview(s){$('preview').textContent=`Scenario: ${s.name}\nPO: ${s.poId||'N/A'}\nActor: ${s.actor||'N/A'}\nAmount: €${s.amountEUR||0}\nPO Qty: ${s.poQty||'-'} | GR Qty: ${s.grQty||'-'}\nInvoice: ${s.invoiceAmount??'-'}\nFlags: ${Object.keys(s).filter(k=>typeof s[k]==='boolean'&&s[k]).join(', ')||'None'}`;}
-function resetUI(){initLayers();$('log').textContent='';$('trace').textContent='';$('kCycle').textContent='0';$('kStatus').textContent='READY';$('kLoops').textContent='-';$('kProof').textContent='No';$('kHuman').textContent='No';$('kPO').textContent='-';}
+function initCards(){cards.innerHTML=''; steps.forEach(([id,t,d])=>{const c=document.createElement('div');c.className='card';c.id=id;c.innerHTML=`<h3>${t}</h3><p>${d}</p>`;cards.appendChild(c);});}
+function active(id){document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));document.getElementById(id)?.classList.add('active');}
+function markLoop(loop){const map={A:'exception',B:'bDecision',C:'bDecision',D:'monitor',T:'ledger'};const el=document.getElementById(map[loop]);if(el)el.classList.add('loop'+loop);}
+function log(msg){logEl.innerHTML += msg+'\n'; logEl.scrollTop=logEl.scrollHeight;}
+function resetUI(){initCards();logEl.innerHTML='';['kCycle','kStatus','kLoops','kProof','kHuman'].forEach(id=>document.getElementById(id).textContent=id==='kProof'||id==='kHuman'?'No':'-');document.getElementById('kCycle').textContent='0';}
 
-async function runScenario(s){running=true;resetUI();setPreview(s);$('kPO').textContent=s.poId||'-';
-let loops=[],cycle=0,status='IN_PROGRESS',proof=false,human=false;
-const req=['poId','actor','amountEUR','poQty','grQty','invoiceAmount','currency'];
-act('entry');cycle++;log('[Entry] authenticate + normalize');await delay();
-if(!trusted.has(s.actor)){status='REJECTED';log('REJECT unauthorized actor');}
-else if(req.some(k=>s[k]===undefined||s[k]===null)){status='REJECTED';log('REJECT corrupt/missing fields');}
-else if(seen.has(s.poId)){status='REJECTED';log('REJECT duplicate PO');}
-else{seen.add(s.poId);log('Entry accepted');}
+async function runScenario(scn){
+  resetUI();
+  const loops=[]; let cycle=0; let human=false; let proof=false; let status='IN_PROGRESS';
+  const req=['poId','actor','amountEUR','poQty','grQty','invoiceAmount','currency'];
 
-if(status!=='REJECTED'){
-  act('lcnc');cycle++;log('[LCNC] route decision');await delay();
-  if(s.manualOnly){loops.push('A');human=true;act('ex');cycle++;loopTag('A','manual-only route to exception handling');log('Manual review resolved');await delay();}
+  active('entry'); cycle++; log('[Event Entry Gate] Authenticating and validating event...'); await sleep(350);
+  if(!state.trusted.has(scn.actor)){status='REJECTED'; log('REJECT unauthorized actor.');}
+  else if(req.some(k=>scn[k]===undefined||scn[k]===null)){status='REJECTED'; log('REJECT corrupt/missing required fields.');}
+  else if(state.seenPOs.has(scn.poId)){status='REJECTED'; log('REJECT duplicate PO.');}
+  else {state.seenPOs.add(scn.poId);log('Event normalized and accepted.');}
 
-  act('rpaExec');cycle++;log('[RPA] extraction');await delay();
-  act('val');cycle++;log('[Validation] 3-way match');await delay();
-  const mism=[]; if(s.poQty!==s.grQty)mism.push('QTY_MISMATCH'); if(s.amountEUR!==s.invoiceAmount)mism.push('INVOICE_MISMATCH');
-  if(mism.length){loops.push('A');human=true;act('ex');cycle++;loopTag('A','mismatch escalated for HITL review');log('Mismatch: '+mism.join(', '));await delay(); if(s.unresolvable){status='TERMINAL';log('TERMINAL retry limit exceeded');}}
+  if(status!=='REJECTED'){
+    active('lcnc'); cycle++; await sleep(350); log('[LCNC] Routing decision: RPA vs Human.');
+    if(scn.manualOnly){loops.push('A');markLoop('A');human=true;active('exception');cycle++;await sleep(350);log('[Exception] Manual-only review resolved.');}
 
-  if(status!=='TERMINAL'){
-    act('bDecision');cycle++;await delay();
-    const need=s.amountEUR>50000||s.complianceAuditFlag;
-    if(!need){const lp=s.directFromEntry?'C':'B';loops.push(lp);loopTag(lp,lp==='C'?'direct re-entry to downstream':'blockchain bypass');log(`Loop ${lp} fired`);} 
-    else{proof=true;act('ledger');cycle++;log('[Ledger] smart contract verification');await delay(); if(s.smartContractTimeout){loops.push('T');human=true;loopTag('T','timeout fallback to exception, then retry');act('ex');cycle++;await delay();}}
+    active('rpaExec'); cycle++; await sleep(300); log('[RPA Execution] Extracted PO/GR/Invoice from connected systems.');
+    active('validation'); cycle++; await sleep(350); log('[Validation] Running 3-way match + rules.');
+    let ex=[]; if(scn.poQty!==scn.grQty)ex.push('QTY_MISMATCH'); if(scn.amountEUR!==scn.invoiceAmount)ex.push('INVOICE_MISMATCH');
+    if(ex.length){loops.push('A'); markLoop('A'); human=true; active('exception');cycle++;await sleep(350); log(`[Exception] Escalated: ${ex.join(', ')}`); if(scn.unresolvable){log('[Exception] Retry limit exceeded. TERMINAL'); status='TERMINAL';}}
 
-    act('off');cycle++;log('[Off-chain] traceability record stored');await delay();
-    act('down');cycle++;log('[Downstream] payment/SLA/compliance');await delay();
-    status='COMPLETE';
+    if(status!=='TERMINAL'){
+      active('bDecision'); cycle++; await sleep(300);
+      const needProof = scn.amountEUR>50000 || scn.complianceAuditFlag;
+      if(!needProof){const loop=scn.directFromEntry?'C':'B'; loops.push(loop); markLoop(loop); log(`[Blockchain Decision] No proof required -> Loop ${loop}.`);}
+      else{proof=true; active('ledger'); cycle++; await sleep(400); if(scn.smartContractTimeout){loops.push('T'); markLoop('T'); human=true; active('exception'); cycle++; log('[Smart Contract] Timeout -> Loop T fallback to exception handling, then retry success.');} else {log('[Smart Contract] On-chain hash proof successful.');}}
+
+      active('offchain'); cycle++; await sleep(300); log('[Off-chain Store] EPCIS/CBV operation record persisted with hash linkage (if any).');
+      active('downstream'); cycle++; await sleep(300); log('[Downstream] Payment/SLA/compliance actions executed.');
+      status='COMPLETE';
+    }
   }
-}
-loops.push('D');loopTag('D','monitoring feedback into LCNC');act('mon');cycle++;log('[Monitoring] KPI feedback complete');await delay();
-$('kCycle').textContent=String(cycle);$('kStatus').textContent=status;$('kLoops').textContent=loops.join(', ');$('kProof').textContent=proof?'Yes':'No';$('kHuman').textContent=human?'Yes':'No';
-running=false;
-}
-async function runAll(){if(running)return;for(const s of scenarios){await runScenario(s);await new Promise(r=>setTimeout(r,250));}}
 
-$('speed').addEventListener('input',e=>$('speedLabel').textContent=e.target.value+'ms');
-$('pause').onclick=()=>paused=true;$('resume').onclick=()=>{paused=false;grant=0;};$('step').onclick=()=>{paused=true;grant++;};
-$('reset').onclick=()=>{paused=false;grant=0;running=false;resetUI();setPreview(scenarios[+$('scenario').value]);};
-$('run').onclick=()=>!running&&runScenario(scenarios[+$('scenario').value]);$('runAll').onclick=()=>runAll();
-scenarios.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;$('scenario').appendChild(o)});
-$('scenario').addEventListener('change',()=>setPreview(scenarios[+$('scenario').value]));
-resetUI();setPreview(scenarios[0]);
+  loops.push('D'); markLoop('D'); active('monitor'); cycle++; await sleep(250); log('[Monitoring] KPI feedback sent to LCNC (Loop D).');
+
+  document.getElementById('kCycle').textContent=String(cycle);
+  document.getElementById('kStatus').textContent=status;
+  document.getElementById('kLoops').textContent=loops.join(', ');
+  document.getElementById('kProof').textContent=proof?'Yes':'No';
+  document.getElementById('kHuman').textContent=human?'Yes':'No';
+  log(`FINAL STATUS: ${status}`);
+}
+
+async function runAll(){for(const s of scenarios){await runScenario(s); await sleep(500);}}
+
+const sel=document.getElementById('scenarioSelect');
+scenarios.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;sel.appendChild(o);});
+initCards();
+document.getElementById('runBtn').onclick=()=>runScenario(scenarios[+sel.value]);
+document.getElementById('runAllBtn').onclick=()=>runAll();
 </script>
 </body>
 </html>
