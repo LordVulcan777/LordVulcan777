@@ -1,0 +1,9 @@
+{
+  "name": "hyperautomation-architecture-sim",
+  "version": "1.0.0",
+  "description": "Node.js simulation of LCNC + RPA + selective blockchain trust architecture",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  }
+}
