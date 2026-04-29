@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hyperautomation Architecture Simulation</title>
+<style>
+:root{--bg:#050b18;--panel:#0e1830;--line:#20375f;--text:#e8f1ff;--muted:#9eb3dd;--ok:#22c55e;--blue:#38bdf8;--vio:#a855f7;--cyan:#14b8a6;--amber:#f59e0b;--green:#22c55e}
+*{box-sizing:border-box;font-family:Inter,Segoe UI,Arial}body{margin:0;background:radial-gradient(circle at top,#0e2248,#050b18 55%);color:var(--text)}
+.wrap{max-width:1700px;margin:auto;padding:12px}.head{display:flex;justify-content:space-between;align-items:center}.h1{font-size:48px;font-weight:800}.sub{font-size:28px;color:#c8d7fa}
+.live{border:1px solid #2a497c;background:#0c1730;border-radius:14px;padding:12px 16px;color:#c3d6ff}
+.kpiTop{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:14px 0}.card{background:#0b1430;border:1px solid #2d467a;border-radius:14px;padding:14px}.card .v{font-size:44px;font-weight:800}
+.body{display:grid;grid-template-columns:1fr 420px;gap:10px}
+.main{background:#07122a;border:1px solid #29457a;border-radius:14px;padding:12px}
+.side{background:#07122a;border:1px solid #29457a;border-radius:14px;padding:12px}
+.canvas{display:grid;grid-template-columns:210px 220px 1fr;gap:12px}
+.col,.flowPanel{background:#0a1733;border:1px solid #2b467a;border-radius:12px;padding:10px}
+.title{font-size:28px;font-weight:700;margin:6px 0 10px}.mini{font-size:22px;color:var(--muted);margin-bottom:10px}
+.stack{display:grid;gap:10px}.node{background:#0f1d3e;border:1px solid #35558f;border-radius:12px;padding:10px;font-size:20px;opacity:.45;transition:.2s}.node b{display:block;font-size:22px;margin-bottom:6px}
+.node.active{opacity:1;box-shadow:0 0 0 2px var(--blue) inset,0 0 16px rgba(56,189,248,.6)}.node.visited{opacity:.9;border-color:#2fa36d}
+.layer{border:1px solid #33518b;border-radius:12px;padding:10px;margin-bottom:10px}.layer h3{margin:0 0 8px;font-size:30px}.lane{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.unit{background:#10224a;border:1px solid #3a5d9b;border-radius:10px;padding:10px;font-size:18px;opacity:.45}.unit.active{opacity:1;box-shadow:0 0 14px rgba(56,189,248,.65)}.unit.visited{opacity:.9;border-color:#34d399}
+.gov{border-color:#7c3aed;background:#261545}.lcnc{border-color:#3b82f6}.rpa{border-color:#14b8a6}.trust{border-color:#f59e0b}.sor{border-color:#22c55e}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.pill{padding:6px 10px;border-radius:999px;border:1px solid #42639f;font-size:18px}.A{background:#351913;color:#ffb089}.B{background:#123024;color:#8cf5bf}.C{background:#24193e;color:#d0b7ff}.D{background:#3b320f;color:#ffea8e}.T{background:#37162d;color:#ff9dd7}
+.controls select,.controls button,.controls input{width:100%;margin:6px 0;padding:10px;border:1px solid #3b5d97;border-radius:10px;background:#0e1832;color:var(--text);font-size:22px}.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.panel{background:#0b1530;border:1px solid #2f4a7d;border-radius:12px;padding:10px;margin-top:10px}.preview,.log,.trace{font-size:18px;color:var(--muted);white-space:pre-wrap}
+.log,.trace{max-height:220px;overflow:auto;background:#081126;border:1px solid #2a467b;border-radius:10px;padding:8px;color:#d8e4ff}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}.k{background:#091126;border:1px solid #2d487c;border-radius:10px;padding:8px}.k .v{font-size:26px;font-weight:800}
+.footer{margin-top:10px;background:#081126;border:1px solid #2a467b;border-radius:12px;padding:12px;font-size:24px;color:#c6d7fb}
+</style>
+</head>
+<body><div class="wrap">
+  <div class="head"><div><div class="h1">Hyperautomation Architecture Simulation</div><div class="sub">LCNC + RPA + Blockchain | End-to-End Flow with Feedback Loops</div></div><div class="live">🟢 Live Simulation</div></div>
+  <div class="kpiTop">
+    <div class="card"><div>Total Scenarios Run</div><div class="v" id="topRuns">0</div></div>
+    <div class="card"><div>Success Rate</div><div class="v" id="topSuccess">0%</div></div>
+    <div class="card"><div>Avg. Execution Time</div><div class="v" id="topAvg">0.00</div></div>
+    <div class="card"><div>Exceptions Handled</div><div class="v" id="topEx">0</div></div>
+    <div class="card"><div>Cost Saved (Est.)</div><div class="v" id="topCost">€0</div></div>
+  </div>
+
+  <div class="body">
+    <div class="main">
+      <div class="title">Architecture Flow (Live Simulation)</div><div class="mini">No arrows mode · components glow by sequence and loop activation.</div>
+      <div class="canvas">
+        <div class="col"><div class="title" style="font-size:24px">ACTORS</div><div class="stack">
+          <div class="node" id="n_supplier"><b>Supplier</b></div><div class="node" id="n_manufacturer"><b>Manufacturer</b></div><div class="node" id="n_logistics"><b>Logistics Provider</b></div><div class="node" id="n_retailer"><b>Retailer</b></div>
+        </div></div>
+        <div class="col"><div class="title" style="font-size:24px">ENTRY GATE</div><div class="stack">
+          <div class="node" id="n_entry"><b>Event Entry Gate</b>Authenticated user inputs<br>Device/scanner events<br>Document submission<br>Auth/source validation<br>Data normalization</div>
+        </div></div>
+        <div class="flowPanel">
+          <div class="layer gov" id="layer_gov"><h3>GOVERNANCE LAYER</h3><div class="lane"><div class="unit" id="u_pol">Policies & Rules</div><div class="unit" id="u_comp">Compliance</div><div class="unit" id="u_risk">Risk & Controls</div><div class="unit" id="u_audit">Audit & Monitoring</div></div></div>
+          <div class="layer lcnc" id="layer_lcnc"><h3>LCNC ORCHESTRATION LAYER</h3><div class="lane"><div class="unit" id="u_wf">Workflow Engine</div><div class="unit" id="u_exc">Exception Handling</div><div class="unit" id="u_case">Case Management</div><div class="unit" id="u_route">Routing Rules</div></div></div>
+          <div class="layer rpa" id="layer_rpa"><h3>RPA EXECUTION & VALIDATION</h3><div class="lane"><div class="unit" id="u_exec">Execution Bot</div><div class="unit" id="u_val">Validation Bot</div><div class="unit" id="u_match">3-way Match</div><div class="unit" id="u_flag">Exception Flagging</div></div></div>
+          <div class="layer trust" id="layer_trust"><h3>BLOCKCHAIN TRUST LAYER</h3><div class="lane"><div class="unit" id="u_dec">Proof Decision</div><div class="unit" id="u_chain">Smart Contract</div><div class="unit" id="u_hash">Immutable Hash</div><div class="unit" id="u_off">Off-chain Store</div></div></div>
+          <div class="layer sor" id="layer_sor"><h3>DOWNSTREAM & SYSTEMS OF RECORD</h3><div class="lane"><div class="unit" id="u_down">Downstream Actions</div><div class="unit" id="u_erp">ERP/WMS/SCM/CRM</div><div class="unit" id="u_mon">Monitoring & KPIs</div><div class="unit" id="u_feed">Feedback Cycle</div></div></div>
+          <div class="legend"><span class="pill A" id="loopA">Loop A</span><span class="pill B" id="loopB">Loop B</span><span class="pill C" id="loopC">Loop C</span><span class="pill D" id="loopD">Loop D</span><span class="pill T" id="loopT">Loop T</span></div>
+        </div>
+      </div>
+      <div class="footer">How it works: Event enters through Entry Gate → Processed by LCNC → Executed by RPA → Verified/recorded in trust layer → Updated in systems of record. Loops capture exception, bypass, re-entry, feedback, and timeout behavior.</div>
+    </div>
+
+    <aside class="side">
+      <div class="title" style="font-size:28px">SCENARIO CONTROL</div>
+      <div class="controls"><select id="scenario"></select><div class="btns"><button id="run">Run</button><button id="runAll">Run All</button><button id="pause">Pause</button><button id="resume">Resume</button><button id="step">Step</button><button id="reset">Reset</button></div><label>Speed <span id="speedLabel">900ms</span></label><input type="range" id="speed" min="250" max="2200" step="50" value="900"></div>
+      <div class="panel"><b>Scenario Preview</b><div class="preview" id="preview"></div></div>
+      <div class="panel"><b>KPIs</b><div class="kpis"><div class="k">Cycle<div class="v" id="kCycle">0</div></div><div class="k">Status<div class="v" id="kStatus">READY</div></div><div class="k">Loops<div class="v" id="kLoops">-</div></div><div class="k">Proof<div class="v" id="kProof">No</div></div><div class="k">Human<div class="v" id="kHuman">No</div></div><div class="k">PO<div class="v" id="kPO">-</div></div></div></div>
+      <div class="panel"><b>Execution Log</b><div class="log" id="log"></div></div>
+      <div class="panel"><b>Loop Trace</b><div class="trace" id="trace"></div></div>
+    </aside>
+  </div>
+</div>
+<script>
+const scenarios=[
+{name:'Happy path: clean PO, no exceptions',poId:'PO-1001',actor:'supplier-alpha',amountEUR:12000,poQty:100,grQty:100,invoiceAmount:12000,currency:'EUR'},
+{name:'Quantity mismatch: GR differs from PO, human resolves',poId:'PO-1002',actor:'supplier-alpha',amountEUR:15000,poQty:100,grQty:95,invoiceAmount:15000,currency:'EUR'},
+{name:'Invoice amount mismatch',poId:'PO-1003',actor:'manufacturer-1',amountEUR:18000,poQty:50,grQty:50,invoiceAmount:17900,currency:'EUR'},
+{name:'High-value PO: mandatory blockchain proof > €50k',poId:'PO-1004',actor:'supplier-alpha',amountEUR:70000,poQty:10,grQty:10,invoiceAmount:70000,currency:'EUR'},
+{name:'Duplicate PO rejected',poId:'PO-1001',actor:'supplier-alpha',amountEUR:12000,poQty:100,grQty:100,invoiceAmount:12000,currency:'EUR'},
+{name:'Corrupt data rejected',poId:'PO-1005',actor:'supplier-alpha',amountEUR:5000,poQty:10,grQty:10,currency:'EUR'},
+{name:'Unauthorized actor rejected',poId:'PO-1006',actor:'unknown-supplier',amountEUR:6000,poQty:20,grQty:20,invoiceAmount:6000,currency:'EUR'},
+{name:'Smart contract timeout Loop T',poId:'PO-1007',actor:'manufacturer-1',amountEUR:90000,poQty:4,grQty:4,invoiceAmount:90000,currency:'EUR',smartContractTimeout:true},
+{name:'Retry limit exceeded terminal',poId:'PO-1008',actor:'supplier-alpha',amountEUR:20000,poQty:30,grQty:20,invoiceAmount:20000,currency:'EUR',unresolvable:true},
+{name:'Partial delivery split payment',poId:'PO-1009',actor:'logistics-7',amountEUR:24000,poQty:100,grQty:60,invoiceAmount:24000,currency:'EUR',partialDelivery:true},
+{name:'Compliance audit mandatory on-chain proof',poId:'PO-1010',actor:'retailer-9',amountEUR:8000,poQty:12,grQty:12,invoiceAmount:8000,currency:'EUR',complianceAuditFlag:true},
+{name:'Direct reroute Loop C',poId:'PO-1011',actor:'supplier-alpha',amountEUR:3000,poQty:5,grQty:5,invoiceAmount:3000,currency:'EUR',directFromEntry:true},
+{name:'Manual-only workflow route',poId:'PO-1012',actor:'manufacturer-1',amountEUR:11000,poQty:40,grQty:40,invoiceAmount:11000,currency:'EUR',manualOnly:true}
+];
+const trusted=new Set(['supplier-alpha','manufacturer-1','logistics-7','retailer-9']); const seen=new Set();
+let paused=false,grant=0,running=false,agg={runs:0,success:0,exceptions:0,cycles:0}; const $=id=>document.getElementById(id);
+function log(m){$('log').textContent+=m+'\n';$('log').scrollTop=$('log').scrollHeight} function trace(m){$('trace').textContent+=m+'\n';$('trace').scrollTop=$('trace').scrollHeight}
+function setActive(ids){ids.forEach(id=>{const e=$(id);if(e){e.classList.add('active');e.classList.remove('visited')}})} function setVisited(ids){ids.forEach(id=>{const e=$(id);if(e){e.classList.remove('active');e.classList.add('visited')}})}
+function dimAll(){document.querySelectorAll('.node,.unit,.layer').forEach(e=>{e.classList.remove('active','visited')});['loopA','loopB','loopC','loopD','loopT'].forEach(i=>$(i).style.boxShadow='none')}
+function hiLoop(l){const id='loop'+l;$(id).style.boxShadow='0 0 14px currentColor';}
+async function wait(){while(paused&&grant===0)await new Promise(r=>setTimeout(r,80));if(grant>0)grant--;await new Promise(r=>setTimeout(r,+$('speed').value)}
+async function step(ids,msg){setActive(ids);log(msg);await wait();setVisited(ids)}
+function updateTop(){ $('topRuns').textContent=agg.runs; const rate=agg.runs?((agg.success/agg.runs)*100).toFixed(1):'0.0'; $('topSuccess').textContent=rate+'%'; $('topAvg').textContent=(agg.runs?(agg.cycles/agg.runs).toFixed(2):'0.00'); $('topEx').textContent=agg.exceptions; $('topCost').textContent='€'+(agg.success*1535).toLocaleString(); }
+async function runScenario(s){running=true;dimAll();$('log').textContent='';$('trace').textContent='';$('kPO').textContent=s.poId; $('preview').textContent=`${s.name}\nActor: ${s.actor}\nAmount: €${s.amountEUR}`;
+let cycle=0,status='IN_PROGRESS',loops=[],human=false,proof=false;
+const actorMap={'supplier-alpha':'n_supplier','manufacturer-1':'n_manufacturer','logistics-7':'n_logistics','retailer-9':'n_retailer'}; await step([actorMap[s.actor]||'n_supplier'],'Actor submits event'); cycle++;
+await step(['n_entry'],'Entry gate validates authentication/source/normalization'); cycle++;
+const missing=['poId','actor','amountEUR','poQty','grQty','invoiceAmount','currency'].filter(k=>s[k]==null);
+if(!trusted.has(s.actor)||missing.length||seen.has(s.poId)){status='REJECTED';log('Rejected at entry gate');}
+else seen.add(s.poId);
+if(status!=='REJECTED'){
+await step(['layer_gov','u_pol','u_comp'],'Governance constraints applied'); cycle++;
+await step(['layer_lcnc','u_wf','u_route'],'LCNC workflow routing + case setup'); cycle++;
+if(s.manualOnly){human=true;loops.push('A');hiLoop('A');trace('Loop A: manual route');await step(['u_exc','u_case'],'Exception handling + human approval');cycle++;}
+await step(['layer_rpa','u_exec'],'RPA execution bot processing');cycle++;
+await step(['u_val','u_match'],'Validation bot checks + 3-way match');cycle++;
+const mism=(s.poQty!==s.grQty)||(s.amountEUR!==s.invoiceAmount);
+if(mism){human=true;loops.push('A');agg.exceptions++;hiLoop('A');trace('Loop A: validation failure escalated');await step(['u_flag','u_exc'],'Exception escalation and resolution');cycle++;if(s.unresolvable){status='TERMINAL';log('Terminal: retry limit exceeded');}}
+if(status!=='TERMINAL'){
+await step(['layer_trust','u_dec'],'Blockchain proof decision evaluated');cycle++;
+const need=s.amountEUR>50000||s.complianceAuditFlag;
+if(!need){loops.push(s.directFromEntry?'C':'B');hiLoop(s.directFromEntry?'C':'B');trace(`Loop ${s.directFromEntry?'C':'B'}: no-proof downstream path`);} else {proof=true;await step(['u_chain','u_hash'],'On-chain smart contract + hash proof');cycle++;if(s.smartContractTimeout){human=true;loops.push('T');hiLoop('T');trace('Loop T: timeout fallback to exception');await step(['u_exc','u_wf'],'Timeout handled and case retried');cycle++;await step(['u_chain'],'Retry succeeded');cycle++;}await step(['u_off'],'Off-chain traceability storage');cycle++;}
+await step(['layer_sor','u_down','u_erp'],'Downstream actions + systems update');cycle++;
+await step(['u_mon','u_feed'],'Monitoring and analytics update');cycle++;loops.push('D');hiLoop('D');trace('Loop D: periodic feedback cycle'); status='COMPLETE';
+}}
+$('kCycle').textContent=cycle; $('kStatus').textContent=status; $('kLoops').textContent=loops.join(', ')||'-'; $('kProof').textContent=proof?'Yes':'No'; $('kHuman').textContent=human?'Yes':'No';
+agg.runs++; agg.cycles+=cycle; if(status==='COMPLETE')agg.success++; updateTop(); running=false;}
+async function runAll(){if(running)return;for(const s of scenarios){await runScenario(s);await new Promise(r=>setTimeout(r,180));}}
+$('speed').oninput=e=>$('speedLabel').textContent=e.target.value+'ms'; $('pause').onclick=()=>paused=true; $('resume').onclick=()=>{paused=false;grant=0}; $('step').onclick=()=>{paused=true;grant++};
+$('reset').onclick=()=>{paused=false;grant=0;running=false;dimAll();$('log').textContent='';$('trace').textContent='';$('kCycle').textContent='0';$('kStatus').textContent='READY';$('kLoops').textContent='-';$('kProof').textContent='No';$('kHuman').textContent='No';$('kPO').textContent='-';};
+$('run').onclick=()=>!running&&runScenario(scenarios[+$('scenario').value]); $('runAll').onclick=()=>runAll();
+scenarios.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.name;$('scenario').appendChild(o)}); $('scenario').onchange=()=>$('preview').textContent=scenarios[+$('scenario').value].name;
+updateTop(); $('preview').textContent=scenarios[0].name;
+</script></body></html>
