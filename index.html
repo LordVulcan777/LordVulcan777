@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hyperautomation Architecture Simulator</title>
+  <style>
+    :root { --bg:#060a16; --text:#e9f2ff; --muted:#9fb0d1; --accent:#27c7ff; --ok:#2ee07f; --err:#ff5f73; --loop-a:#ff6b6b; --loop-b:#69f0ae; --loop-c:#3dd5ff; --loop-d:#ffd54f; --loop-t:#b388ff; --border:#1f2c53; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:Inter,Segoe UI,Roboto,Arial,sans-serif; background:radial-gradient(circle at top,#0f1d44 0%,var(--bg) 55%); color:var(--text); }
+    .app{padding:12px;display:grid;gap:10px}.panel{background:linear-gradient(180deg,rgba(13,25,54,.95),rgba(8,16,35,.95));border:1px solid var(--border);border-radius:10px}
+    .header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px}.title h1{margin:0;font-size:28px}.title p{margin:3px 0 0;color:var(--muted)}.status{color:var(--ok);font-weight:700}
+    .kpis{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px}.kpi{padding:12px}.kpi .label{color:var(--muted);font-size:12px}.kpi .value{margin-top:4px;font-size:26px;font-weight:700}
+    .main{display:grid;grid-template-columns:320px 1fr 360px;gap:10px;min-height:620px}.left,.right{display:grid;gap:10px;align-content:start}.center{padding:10px;overflow:auto}
+    .section-title{font-weight:700;padding:10px 12px;border-bottom:1px solid var(--border);color:#7bc8ff}.controls,.details,.log,.run-summary,.payload{padding:10px}
+    select,button,input[type="range"]{width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid #2a3a67;background:#0a1430;color:var(--text)}
+    button{cursor:pointer;font-weight:600}.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mini{font-size:12px;color:var(--muted)}
+    #diagram{position:relative;min-width:1460px;height:740px;background:rgba(8,16,35,.55);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .node{position:absolute;padding:8px;border:1px solid #2b426e;border-radius:10px;background:linear-gradient(180deg,rgba(16,33,67,.9),rgba(10,20,44,.9));transition:.2s}
+    .node h4{margin:0 0 4px;font-size:15px}.node p{margin:0;font-size:12px;color:var(--muted);line-height:1.25}.node.governance{border-style:dashed;border-color:#a885ff;background:rgba(95,56,180,.16)}.node.context{border-color:#4263aa;background:rgba(45,82,166,.16)}
+    .node.active{box-shadow:0 0 0 2px var(--accent),0 0 16px rgba(39,199,255,.45)}.node.done{box-shadow:0 0 0 2px var(--ok)}.node.exc{box-shadow:0 0 0 2px var(--err)}.node.bypass{opacity:.6;border-style:dashed}
+    svg#links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.edge{stroke:#6584c3;stroke-width:2;fill:none;opacity:.35}.edge.visited{opacity:.8}.edge.active{opacity:1;stroke:var(--accent);stroke-dasharray:6 4;animation:pulse 1s linear infinite}
+    .edge.loopA{stroke:var(--loop-a)}.edge.loopB{stroke:var(--loop-b)}.edge.loopC{stroke:var(--loop-c)}.edge.loopD{stroke:var(--loop-d);stroke-dasharray:6 6}.edge.loopT{stroke:var(--loop-t);stroke-dasharray:6 6}
+    @keyframes pulse{to{stroke-dashoffset:-20}} .log-list{max-height:260px;overflow:auto;font-size:13px}.log-item{padding:5px 0;border-bottom:1px dashed #24375f}
+    .pathbar,.legend{padding:10px;display:flex;flex-wrap:wrap;gap:6px}.chip{padding:6px 8px;border-radius:8px;border:1px solid #335188;background:#122248;font-size:12px}.legend .chip{border-style:dashed}.footer-note{color:#b8c5e4;font-size:12px;padding:8px 12px 14px}
+    @media (max-width:1400px){.main{grid-template-columns:1fr}#diagram{min-width:1460px;height:780px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header panel"><div class="title"><h1>Hyperautomation Architecture Simulator</h1><p>LCNC + RPA + Selective Blockchain Trust | Thesis Concept Demonstration</p></div><div class="status">● LIVE SIMULATION</div></div>
+  <div class="kpis" id="kpiCards"></div>
+  <div class="main">
+    <div class="left"><div class="panel"><div class="section-title">Scenario Control</div><div class="controls">
+      <select id="scenarioSelect"></select><div class="btn-row"><button id="runBtn">Run Scenario</button><button id="runAllBtn">Run All Base Scenarios</button></div>
+      <div class="btn-row"><button id="pauseBtn">Pause</button><button id="resumeBtn">Resume</button></div><div class="btn-row"><button id="stepBtn">Step +1</button><button id="resetBtn">Reset</button></div>
+      <button id="clearLogBtn">Clear Log</button><label class="mini">Speed <input id="speedSlider" type="range" min="120" max="1400" value="500" /></label>
+      <button id="genBtn">Generate 1000 Cases</button><button id="runGenBtn">Run Generated Cases</button>
+      <button id="exportReportBtn">Export Report</button><button id="exportTransitionBtn">Export Transition Table CSV</button><button id="exportScenarioBtn">Export Scenario Results CSV</button>
+    </div></div><div class="panel"><div class="section-title">Scenario Details</div><div id="scenarioDetails" class="details"></div></div></div>
+    <div class="center panel"><div id="diagram"><svg id="links"></svg></div><div class="pathbar" id="pathBar"></div><div class="legend panel" style="margin-top:8px;"><span class="chip">Loop A: Validation fail → Exception → Human → LCNC</span><span class="chip">Loop B: No proof bypass</span><span class="chip">Loop C: Downstream-triggered re-entry</span><span class="chip">Loop D: Periodic monitoring feedback</span><span class="chip">Loop T: Smart contract timeout fallback</span></div><div class="footer-note">This is a conceptual proof-of-logic simulation. Results are assumption-dependent and do not represent empirical operational performance.</div></div>
+    <div class="right"><div class="panel"><div class="section-title">Execution Log</div><div class="log"><div id="logList" class="log-list"></div></div></div><div class="panel"><div class="section-title">Per-run KPI Summary</div><div id="runSummary" class="run-summary"></div></div><div class="panel"><div class="section-title">Payload Preview / Result Summary</div><pre id="payload" class="payload"></pre></div></div>
+  </div>
+</div>
+<script>
+const NODES=[{id:'gov',label:'Governance and Policy Layer',cls:'governance',x:220,y:10,w:560,h:86,desc:'who submits events, who changes rules, on/off-chain policy, unresolved exception policy'},{id:'actors',label:'Supply Chain Actors',cls:'context',x:10,y:110,w:180,h:160,desc:'Supplier, Manufacturer, Logistics Provider, Retailer'},{id:'1',label:'1 Event Entry Gate',x:220,y:120,w:220,h:120,desc:'authenticated input, source validation, normalization, schema check'},{id:'2',label:'2 LCNC Workflow Engine',x:470,y:120,w:220,h:120,desc:'workflow case object, state and routing orchestration'},{id:'3',label:'3 RPA Execution',x:720,y:120,w:220,h:120,desc:'structured repetitive digital execution only'},{id:'4',label:'4 Validation',x:970,y:120,w:220,h:120,desc:'3-way/consistency/quantity/invoice/business rules'},{id:'5',label:'5 Exception Handling',x:720,y:280,w:220,h:100,desc:'classify and escalate exceptions'},{id:'5b',label:'5b Human Review',x:970,y:280,w:220,h:100,desc:'manual correction / approvals before re-entry'},{id:'6',label:'6 Blockchain Proof Decision',x:470,y:280,w:220,h:100,desc:'proof if compliance/high-value/low-trust/explicit-rule'},{id:'7',label:'7 Blockchain Trust Enforcement / Ledger / Smart Contract',x:470,y:400,w:470,h:100,desc:'hash proof, smart contract, immutable record, timeout fallback'},{id:'8',label:'8 Off-chain Traceability Store',x:220,y:520,w:340,h:100,desc:'full operational record with hash/reference linkage'},{id:'9',label:'9 Downstream Actions',x:590,y:520,w:300,h:100,desc:'payment, SLA, compliance logging, next trigger'},{id:'10',label:'10 Monitoring and Analytics / KPI Feedback',x:220,y:640,w:670,h:90,desc:'status, exception trends, delays, timeout counts, validation rates'},{id:'ext',label:'Enterprise Systems / Integration Context',cls:'context',x:1220,y:140,w:220,h:300,desc:'ERP, WMS, SCM, CRM/Supplier Portal, API, reads/writes, message exchange'}];
+const EDGES=[['actors','1',''],['1','2',''],['2','3',''],['3','4',''],['4','6',''],['6','7',''],['7','8',''],['8','9',''],['9','10',''],['2','5','loopA'],['4','5','loopA'],['5','5b','loopA'],['5b','2','loopA'],['6','8','loopB'],['9','2','loopC'],['2','9','loopC'],['10','gov','loopD'],['7','5','loopT'],['gov','2','loopD'],['gov','6','loopD'],['gov','10','loopD'],['2','ext',''],['3','ext',''],['4','ext',''],['8','ext','']];
+
+const baseScenarios=[
+{id:'SCN-001',name:'Happy path internal high trust no compliance proof',caseData:{order_origin:'internal',approval_source:'internal',trust_level:'high',compliance_critical:false,amount:18000,validation_status:'pass',timeout_expected:false,downstream_trigger:false,actor:'Supplier',actor_authorized:true,payload_complete:true,payload_corrupt:false,is_duplicate:false,quantity_mismatch:false,invoice_mismatch:false,business_rule_error:false,task_structured:true,digitally_executable:true,proof_required:false}},
+{id:'SCN-002',name:'External high trust, no proof needed',caseData:{order_origin:'external',approval_source:'external',trust_level:'high',compliance_critical:false,amount:22000,validation_status:'pass',timeout_expected:false,downstream_trigger:false,actor:'Logistics Provider',actor_authorized:true,payload_complete:true,payload_corrupt:false,is_duplicate:false,quantity_mismatch:false,invoice_mismatch:false,business_rule_error:false,task_structured:true,digitally_executable:true,proof_required:false}},
+{id:'SCN-003',name:'Validation failure / Loop A',caseData:{order_origin:'internal',approval_source:'internal',trust_level:'high',compliance_critical:false,amount:19000,validation_status:'fail',timeout_expected:false,downstream_trigger:false,actor:'Manufacturer',actor_authorized:true,payload_complete:true,payload_corrupt:false,is_duplicate:false,quantity_mismatch:true,invoice_mismatch:false,business_rule_error:false,task_structured:true,digitally_executable:true,proof_required:false}},
+{id:'SCN-004',name:'Compliance proof required',caseData:{order_origin:'internal',approval_source:'internal',trust_level:'high',compliance_critical:true,amount:26000,validation_status:'pass',timeout_expected:false,downstream_trigger:false,actor:'Retailer',actor_authorized:true,payload_complete:true,payload_corrupt:false,is_duplicate:false,quantity_mismatch:false,invoice_mismatch:false,business_rule_error:false,task_structured:true,digitally_executable:true,proof_required:false}},
+{id:'SCN-005',name:'High-value / low-trust proof required',caseData:{order_origin:'external',approval_source:'external',trust_level:'low',compliance_critical:false,amount:82000,validation_status:'pass',timeout_expected:false,downstream_trigger:false,actor:'Supplier',actor_authorized:true,payload_complete:true,payload_corrupt:false,is_duplicate:false,quantity_mismatch:false,invoice_mismatch:false,business_rule_error:false,task_structured:true,digitally_executable:true,proof_required:false}},
+{id:'SCN-006',name:'Smart contract timeout / Loop T',caseData:{order_origin:'external',approval_source:'external',trust_level:'low',compliance_critical:true,amount:95000,validation_status:'pass',timeout_expected:true,downstream_trigger:false,actor:'Manufacturer',actor_authorized:true,payload_complete:true,payload_corrupt:false,is_duplicate:false,quantity_mismatch:false,invoice_mismatch:false,business_rule_error:false,task_structured:true,digitally_executable:true,proof_required:false}},
+{id:'SCN-007',name:'Duplicate PO reject',caseData:{order_origin:'internal',approval_source:'internal',trust_level:'high',compliance_critical:false,amount:12000,validation_status:'pass',timeout_expected:false,downstream_trigger:false,actor:'Supplier',actor_authorized:true,payload_complete:true,payload_corrupt:false,is_duplicate:true,quantity_mismatch:false,invoice_mismatch:false,business_rule_error:false,task_structured:true,digitally_executable:true,proof_required:false}},
+{id:'SCN-008',name:'Corrupt / missing field reject',caseData:{order_origin:'internal',approval_source:'internal',trust_level:'high',compliance_critical:false,amount:12000,validation_status:'pass',timeout_expected:false,downstream_trigger:false,actor:'Supplier',actor_authorized:true,payload_complete:false,payload_corrupt:true,is_duplicate:false,quantity_mismatch:false,invoice_mismatch:false,business_rule_error:false,task_structured:true,digitally_executable:true,proof_required:false}},
+{id:'SCN-009',name:'Unauthorized actor reject',caseData:{order_origin:'external',approval_source:'external',trust_level:'low',compliance_critical:false,amount:12000,validation_status:'pass',timeout_expected:false,downstream_trigger:false,actor:'Unknown',actor_authorized:false,payload_complete:true,payload_corrupt:false,is_duplicate:false,quantity_mismatch:false,invoice_mismatch:false,business_rule_error:false,task_structured:true,digitally_executable:true,proof_required:false}},
+{id:'SCN-010',name:'Downstream trigger / Loop C',caseData:{order_origin:'internal',approval_source:'internal',trust_level:'high',compliance_critical:false,amount:14000,validation_status:'pass',timeout_expected:false,downstream_trigger:true,actor:'Retailer',actor_authorized:true,payload_complete:true,payload_corrupt:false,is_duplicate:false,quantity_mismatch:false,invoice_mismatch:false,business_rule_error:false,task_structured:true,digitally_executable:true,proof_required:false}}
+];
+
+let state={animation:null,history:[],generated:[]};
+const metrics={total:0,success:0,rejected:0,exceptions:0,human:0,proofs:0,bypass:0,totalMs:0};
+const q=s=>document.querySelector(s), el=(t,c)=>{const n=document.createElement(t);if(c)n.className=c;return n;};
+
+function routeCase(caseData){
+  const path=['1'], loops=[];
+  let rejectionReason='';
+  if(!caseData.actor_authorized) rejectionReason='unauthorized_actor';
+  else if(!caseData.payload_complete||caseData.payload_corrupt) rejectionReason='corrupt_or_missing_payload';
+  else if(caseData.is_duplicate) rejectionReason='duplicate_case';
+  const rejection=Boolean(rejectionReason);
+  if(rejection){
+    return {path,loops_triggered:[],proof_required:false,final_status:'REJECTED',human_intervention:false,exception_count:0,path_string:path.join('>'),rejection_reason:rejectionReason||'entry_rejection'};
+  }
+  path.push('2');
+  let human=false, exceptions=0;
+  const rpaEligible=caseData.task_structured&&caseData.digitally_executable;
+  if(!rpaEligible){ path.push('5','5b','2'); loops.push('A'); human=true; exceptions++; }
+  path.push('3','4');
+  const validationFailed=caseData.validation_status==='fail'||caseData.quantity_mismatch||caseData.invoice_mismatch||caseData.business_rule_error;
+  if(validationFailed){
+    path.push('5','5b','2','3','4'); loops.push('A'); human=true; exceptions++;
+  }
+  path.push('6');
+  const proofRequired=!!(caseData.compliance_critical||caseData.amount>50000||caseData.trust_level==='low'||caseData.proof_required===true);
+  if(!proofRequired){ path.push('8'); loops.push('B'); }
+  else {
+    path.push('7');
+    if(caseData.timeout_expected){ path.push('5','5b','2','3','4','6','7'); loops.push('T'); human=true; exceptions++; }
+    path.push('8');
+  }
+  path.push('9');
+  if(caseData.downstream_trigger){ path.push('2','9'); loops.push('C'); }
+  path.push('10');
+  loops.push('D');
+  return {path,loops_triggered:[...new Set(loops)],proof_required:proofRequired,final_status:'SUCCESS',human_intervention:human,exception_count:exceptions,path_string:path.join('>'),rejection_reason:''};
+}
+
+function renderDiagram(){const d=q('#diagram');NODES.forEach(n=>{const div=el('div','node '+(n.cls||''));div.id='node-'+n.id;div.style.cssText=`left:${n.x}px;top:${n.y}px;width:${n.w}px;height:${n.h}px`;div.innerHTML=`<h4>${n.label}</h4><p>${n.desc}</p>`;d.appendChild(div)});const svg=q('#links');EDGES.forEach(([a,b,cls],i)=>{const na=NODES.find(n=>n.id===a),nb=NODES.find(n=>n.id===b);const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('id','edge-'+i);p.setAttribute('class','edge '+cls);p.setAttribute('d',`M ${na.x+na.w} ${na.y+na.h/2} C ${na.x+na.w+40} ${na.y+na.h/2}, ${nb.x-40} ${nb.y+nb.h/2}, ${nb.x} ${nb.y+nb.h/2}`);svg.appendChild(p);});}
+function clearStates(){document.querySelectorAll('.node').forEach(n=>n.classList.remove('active','done','exc','bypass'));document.querySelectorAll('.edge').forEach(e=>e.classList.remove('active','visited'));q('#pathBar').innerHTML='';}
+function highlightTransition(prev,curr){document.querySelectorAll('.edge.active').forEach(e=>{e.classList.remove('active');e.classList.add('visited')});const i=EDGES.findIndex(e=>e[0]===prev&&e[1]===curr);if(i>=0)q('#edge-'+i).classList.add('active');}
+function log(m,t=''){const i=el('div','log-item');i.textContent=`${new Date().toLocaleTimeString()} — ${m}${t?` [${t}]`:''}`;q('#logList').prepend(i)}
+function addChip(s){const c=el('span','chip');c.textContent=s;q('#pathBar').appendChild(c)}
+function toCSV(rows){return rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');}
+
+function updateKpis(){const avg=metrics.total?(metrics.totalMs/metrics.total).toFixed(2):'0.00';const cards=[['Total scenarios run',metrics.total],['Success rate',metrics.total?((metrics.success/metrics.total)*100).toFixed(1)+'%':'0%'],['Average execution time',avg+' ms'],['Exceptions / Human',`${metrics.exceptions} / ${metrics.human}`],['Proof required / Avoided writes',`${metrics.proofs} / ${metrics.bypass}`]];q('#kpiCards').innerHTML='';cards.forEach(([l,v])=>{const k=el('div','panel kpi');k.innerHTML=`<div class='label'>${l}</div><div class='value'>${v}</div>`;q('#kpiCards').appendChild(k);});}
+function applyMetrics(r,ms){metrics.total++;if(r.final_status==='SUCCESS'||r.final_status==='COMPLETE')metrics.success++;if(r.final_status==='REJECTED')metrics.rejected++;metrics.exceptions+=r.exception_count; if(r.human_intervention)metrics.human++;if(r.proof_required)metrics.proofs++;if((r.final_status==='SUCCESS'||r.final_status==='COMPLETE')&&r.loops_triggered.includes('B'))metrics.bypass++;metrics.totalMs+=ms;updateKpis();}
+function pushHistory(id,data,r){state.history.push({scenario_id:id,order_origin:data.order_origin,approval_source:data.approval_source,trust_level:data.trust_level,compliance_critical:data.compliance_critical,validation_status:data.validation_status,proof_required:r.proof_required,loops_triggered:r.loops_triggered.join('|'),final_status:r.final_status,exception_count:r.exception_count,human_intervention:r.human_intervention,rejection_reason:r.rejection_reason||'',path_string:r.path_string});}
+
+function runAnimatedCase(id,data,result){
+  if(state.animation && state.animation.timer) clearTimeout(state.animation.timer);
+  if(state.animation){
+    state.animation.done = true;
+    state.animation.paused = true;
+  }
+  clearStates();const run={id,data,result,idx:0,paused:false,start:performance.now(),done:false,timer:null,stepMode:false};state.animation=run;q('#payload').textContent=JSON.stringify(data,null,2);
+  const finalize=()=>{run.done=true;document.querySelectorAll('.edge.active').forEach(e=>{e.classList.remove('active');e.classList.add('visited')});const ms=performance.now()-run.start;applyMetrics(run.result,ms);pushHistory(run.id,run.data,run.result);q('#runSummary').innerHTML=`Scenario: <b>${run.id}</b><br>Final status: <b>${run.result.final_status}</b><br>Step count: ${run.result.path.length}<br>Loops triggered: ${run.result.loops_triggered.join(', ')}<br>Blockchain proof: ${run.result.proof_required?'Yes':'No'}<br>Human intervention: ${run.result.human_intervention?'Yes':'No'}<br>Execution time: ${ms.toFixed(0)} ms<br>Exception count: ${run.result.exception_count}`;log(`Completed ${run.id} with ${run.result.final_status}`,'END');};
+  const tick=()=>{ if(run.paused||run.done) return; if(run.idx>=run.result.path.length){finalize();return;} const curr=run.result.path[run.idx], prev=run.result.path[run.idx-1];
+    if(!run.nodeEntered){ if(prev)highlightTransition(prev,curr); const node=q('#node-'+curr); if(node) node.classList.add('active'); log(`Entered ${curr} for ${run.id}`); if(['5','5b'].includes(curr)&&node) node.classList.add('exc'); addChip(curr); run.nodeEntered=true; }
+    const node=q('#node-'+curr);
+    run.timer=setTimeout(()=>{if(node){node.classList.remove('active');node.classList.add(run.result.final_status==='REJECTED'?'exc':'done');} if(curr==='6'&&!run.result.proof_required)q('#node-7').classList.add('bypass'); run.idx++; run.nodeEntered=false; if(run.stepMode){run.stepMode=false;run.paused=true;return;} tick();}, Number(q('#speedSlider').value));
+  };
+  run.advance=tick;
+  run.step=()=>{ if(run.done) return; run.stepMode=true; run.paused=false; tick(); };
+  tick();
+}
+
+function routeScenario(s){return routeCase(s.caseData);}
+function showScenarioDetails(s){const r=routeScenario(s);q('#scenarioDetails').innerHTML=`<b>${s.id}</b><br>${s.name}<br><br>Expected Path: ${r.path.join(' > ')}<br>Loops: ${r.loops_triggered.join(', ')}<br>Proof Required: ${r.proof_required?'Yes':'No'}<br>Final status: ${r.final_status}`;q('#payload').textContent=JSON.stringify(s.caseData,null,2)}
+function runSelected(){const s=baseScenarios.find(x=>x.id===q('#scenarioSelect').value);const r=routeScenario(s);runAnimatedCase(s.id,s.caseData,r)}
+function runAllBase(){let i=0;const next=()=>{if(i>=baseScenarios.length)return;const s=baseScenarios[i++],r=routeScenario(s);runAnimatedCase(s.id,s.caseData,r);setTimeout(next, (Number(q('#speedSlider').value)+25)*(r.path.length+1));};next();}
+
+function generateCases(){const actors=['Supplier','Manufacturer','Logistics Provider','Retailer'];state.generated=[];for(let i=0;i<1000;i++){const trust=Math.random()<0.2?'low':'high';const d={order_origin:Math.random()<0.55?'internal':'external',approval_source:Math.random()<0.65?'internal':'external',trust_level:trust,compliance_critical:Math.random()<0.18,amount:Math.floor(1000+Math.random()*120000),validation_status:Math.random()<0.14?'fail':'pass',timeout_expected:Math.random()<0.07,downstream_trigger:Math.random()<0.2,actor:actors[Math.floor(Math.random()*actors.length)],actor_authorized:Math.random()>0.06,payload_complete:Math.random()>0.08,payload_corrupt:Math.random()<0.05,is_duplicate:Math.random()<0.06,quantity_mismatch:Math.random()<0.1,invoice_mismatch:Math.random()<0.08,business_rule_error:Math.random()<0.06,task_structured:Math.random()>0.04,digitally_executable:Math.random()>0.04,proof_required:Math.random()<0.09};state.generated.push({id:`GEN-${String(i+1).padStart(4,'0')}`,data:d});}log('Generated 1000 synthetic cases (attribute-based)','BATCH')}
+function runGeneratedFast(){if(!state.generated.length){log('Generate cases first','WARN');return;}const start=performance.now();state.generated.forEach(c=>{const r=routeCase(c.data);const ms=r.path.length*100+r.exception_count*300+(r.proof_required?200:0);applyMetrics(r,ms);pushHistory(c.id,c.data,r);});log(`Fast batch complete: ${state.generated.length} cases in ${(performance.now()-start).toFixed(1)} ms (conceptual timing model)`,'BATCH')}
+
+function csvDownload(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'}));a.download=name;a.click();}
+function exportTransition(){const rows=[['from_state','condition','to_state','loop_id','explanation'],['Event Entry Gate','unauthorized actor / corrupt or missing payload / duplicate case','Rejected Terminal','-','Reject at entry gate'],['Event Entry Gate','entry checks passed','LCNC Workflow Engine','-','Validated and normalized event enters workflow'],['LCNC Workflow Engine','structured and digitally executable task','RPA Execution','-','Eligible case routed to automation'],['LCNC Workflow Engine','non-RPA eligible / special handling','Exception Handling','A','Route to exception and human loop'],['RPA Execution','execution completed','Validation','-','RPA task payload proceeds to validation'],['Validation','validation pass','Blockchain Proof Decision','-','Validated case proceeds to proof decision'],['Validation','validation fail','Exception Handling','A','Validation failure escalates to exception loop'],['Exception Handling','manual review required','Human Review','A','Escalated to human resolution'],['Human Review','resolved and updated','LCNC Workflow Engine','A','Re-enter workflow with updated state'],['Blockchain Proof Decision','proof required','Blockchain Trust Enforcement','-','Compliance/high-value/low-trust/explicit proof rule'],['Blockchain Proof Decision','proof not required','Off-chain Traceability Store','B','Bypass chain, keep operational traceability'],['Blockchain Trust Enforcement','smart contract timeout','Exception Handling','T','Timeout fallback to exception handling'],['Blockchain Trust Enforcement','verification success','Off-chain Traceability Store','-','On-chain proof links to operational record'],['Off-chain Traceability Store','record persisted','Downstream Actions','-','Operational action can proceed'],['Downstream Actions','follow-on workflow trigger','LCNC Workflow Engine','C','Loop C re-entry for next workflow'],['Downstream Actions','case action complete','Monitoring and Analytics','-','Send KPI data and outcome'],['Monitoring and Analytics','periodic KPI/rule review','Governance / Rule Review','D','Periodic monitoring feedback; not a per-case operational transaction loop.']];csvDownload('transition_table.csv',toCSV(rows));}
+function exportScenario(){const h=['scenario_id','order_origin','approval_source','trust_level','compliance_critical','validation_status','proof_required','loops_triggered','final_status','exception_count','human_intervention','rejection_reason','path_string'];const rows=[h,...state.history.map(o=>h.map(k=>o[k]??''))];csvDownload('scenario_results.csv',toCSV(rows));}
+function exportReport(){const rows=[['metric','value'],['total_runs',metrics.total],['success_rate',metrics.total?((metrics.success/metrics.total)*100).toFixed(2):0],['avg_execution_ms',metrics.total?(metrics.totalMs/metrics.total).toFixed(2):0],['exceptions_handled',metrics.exceptions],['human_interventions',metrics.human],['blockchain_proofs_required',metrics.proofs],['avoided_unnecessary_blockchain_writes',metrics.bypass],['completed_cases',metrics.success],['rejected_cases',metrics.rejected]];csvDownload('basic_report.csv',toCSV(rows));}
+
+function populate(){const s=q('#scenarioSelect');baseScenarios.forEach(sc=>{const o=document.createElement('option');o.value=sc.id;o.textContent=`${sc.id} — ${sc.name}`;s.appendChild(o);});s.value='SCN-001';s.onchange=()=>showScenarioDetails(baseScenarios.find(x=>x.id===s.value));s.onchange();updateKpis();}
+q('#runBtn').onclick=runSelected;q('#runAllBtn').onclick=runAllBase;
+q('#pauseBtn').onclick=()=>{if(state.animation&&!state.animation.done){state.animation.paused=true;if(state.animation.timer)clearTimeout(state.animation.timer);log('Paused current run','CTRL')}};
+q('#resumeBtn').onclick=()=>{if(state.animation&&state.animation.paused&&!state.animation.done){state.animation.paused=false;log('Resumed current run','CTRL');state.animation.advance();}};
+q('#stepBtn').onclick=()=>{if(state.animation&&!state.animation.done){if(state.animation.timer)clearTimeout(state.animation.timer);state.animation.paused=true;state.animation.step();log('Step +1 executed','STEP');}};
+q('#resetBtn').onclick=()=>{ if(state.animation && state.animation.timer) clearTimeout(state.animation.timer); if(state.animation){ state.animation.done = true; state.animation.paused = true; } clearStates(); q('#runSummary').innerHTML=''; state.animation=null; };q('#clearLogBtn').onclick=()=>q('#logList').innerHTML='';q('#genBtn').onclick=generateCases;q('#runGenBtn').onclick=runGeneratedFast;
+q('#exportReportBtn').onclick=exportReport;q('#exportTransitionBtn').onclick=exportTransition;q('#exportScenarioBtn').onclick=exportScenario;
+renderDiagram();populate();
+</script>
+</body>
+</html>
